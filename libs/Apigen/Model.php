@@ -27,6 +27,9 @@ class Model extends NetteX\Object
 	/** @var array Classes to be skipped */
 	public $skipClasses = array();
 
+	/** @var string Path to file to log last used class (useful when loading crashes) */
+	public $logLastUsedClass = null;
+
 	/** @var string */
 	private $dir;
 
@@ -59,6 +62,7 @@ class Model extends NetteX\Object
 		}
 
 		if($this->useRobotLoader) $robot->unregister();
+		if($this->logLastUsedClass) @unlink($this->logLastUsedClass);
 	}
 
 
@@ -96,6 +100,7 @@ class Model extends NetteX\Object
 				}
 			}
 		}
+		if($this->logLastUsedClass) @unlink($this->logLastUsedClass);
 	}
 
 
@@ -195,6 +200,8 @@ class Model extends NetteX\Object
 	 */
 	protected function getClassReflection($name)
 	{
+		if($this->logLastUsedClass) file_put_contents($this->logLastUsedClass, $name);
+		
 		if(in_array($name, $this->skipClasses)) return false;
 		if(!class_exists($name)) return false;
 
