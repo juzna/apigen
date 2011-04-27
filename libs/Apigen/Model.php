@@ -24,6 +24,9 @@ class Model extends NetteX\Object
 	/** @var bool Use robot loader for autoloading classes */
 	public $useRobotLoader = true;
 
+	/** @var array Classes to be skipped */
+	public $skipClasses = array();
+
 	/** @var string */
 	private $dir;
 
@@ -49,7 +52,7 @@ class Model extends NetteX\Object
 		$this->dir = realpath($dir);
 		$this->classes = array();
 		foreach ($robot->getIndexedClasses() as $name => $foo) {
-			$class = new CustomClassReflection($name);
+			if (!$class = $this->getClassReflection($name)) continue;
 			if (!$class->hasAnnotation('internal') && !$class->hasAnnotation('deprecated')) {
 				$this->classes[$name] = $class;
 			}
@@ -71,7 +74,7 @@ class Model extends NetteX\Object
 		foreach ($this->classes as $name => $class) {
 			foreach (array_merge(class_parents($name),$class->getInterfaceNames(), $class->getTypeHintingClasses()) as $parent) {
 				if (!isset($this->classes[$parent])) {
-					$this->classes[$parent] = new CustomClassReflection($parent);
+					$this->classes[$parent] = $this->getClassReflection($parent);
 				}
 			}
 
@@ -86,7 +89,7 @@ class Model extends NetteX\Object
 						foreach (explode('|', $types) as $name) {
 							$name = ltrim($name, '\\');
 							if (!isset($this->classes[$name]) && isset($declared[$name])) {
-								$this->classes[$name] = new CustomClassReflection($name);
+								$this->classes[$name] = $this->getClassReflection($name);
 							}
 						}
 					}
@@ -185,4 +188,22 @@ class Model extends NetteX\Object
 		return NetteX\Utils\Strings::normalize(trim($doc));
 	}
 
+	/**
+	 * Try to find reflection for a class
+	 * @param string $name Class name
+	 * @return \Apigen\CustomClassReflection|false
+	 */
+	protected function getClassReflection($name)
+	{
+		if(in_array($name, $this->skipClasses)) return false;
+		if(!class_exists($name)) return false;
+
+		try {
+			return new CustomClassReflection($name);
+		}
+		catch(\ReflectionException $e) {
+			echo $e->getMessage() . "\n";
+			return false;
+		}
+	}
 }
