@@ -34,8 +34,12 @@ class CustomClassReflection extends NetteX\Reflection\ClassType
 		$classes = array();
 		foreach ($methods as $method) {
 			foreach($method->getParameters() as $param) {
-				if ($class = $param->getClass()) {
-					$classes[] = $class->getName();
+				try {
+					if ($class = $param->getClass()) {
+						$classes[] = $class->getName();
+					}
+				} catch (\ReflectionException $e) {
+					echo $e->getMessage() . "\n";
 				}
 			}
 		}
