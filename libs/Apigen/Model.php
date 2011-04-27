@@ -21,6 +21,9 @@ use NetteX;
  */
 class Model extends NetteX\Object
 {
+	/** @var bool Use robot loader for autoloading classes */
+	public $useRobotLoader = true;
+
 	/** @var string */
 	private $dir;
 
@@ -39,7 +42,8 @@ class Model extends NetteX\Object
 		$robot = new NetteX\Loaders\RobotLoader;
 		$robot->setCacheStorage(new NetteX\Caching\Storages\MemoryStorage);
 		$robot->addDirectory($dir);
-		$robot->register();
+		if ($this->useRobotLoader) $robot->register();
+		else $robot->rebuild(); // Just load php files, but not register loader
 
 		// load add classes
 		$this->dir = realpath($dir);
@@ -51,7 +55,7 @@ class Model extends NetteX\Object
 			}
 		}
 
-		$robot->unregister();
+		if($this->useRobotLoader) $robot->unregister();
 	}
 
 
