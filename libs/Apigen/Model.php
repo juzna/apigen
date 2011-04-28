@@ -202,7 +202,7 @@ class Model extends NetteX\Object
 	{
 		if($this->logLastUsedClass) file_put_contents($this->logLastUsedClass, $name);
 		
-		if(in_array($name, $this->skipClasses)) return false;
+		if(in_array(strtolower($name), $this->skipClasses) || in_array($name, $this->skipClasses)) return false;
 		if(!class_exists($name)) return false;
 
 		try {
