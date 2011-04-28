@@ -24,7 +24,7 @@ APIGen version 0.1
 ------------------
 ';
 
-$options = getopt('s:d:c:t:l:');
+$options = getopt('s:d:c:t:l:', array('norobot', 'skip:', 'logclass:'));
 
 if (!isset($options['s'], $options['d'])) { ?>
 Usage:
@@ -36,6 +36,9 @@ Options:
 	-c <path>  Output config file.
 	-l <path>  Directory with libraries
 	-t ...     Title of generated documentation.
+	--norobot          Do not use RobotLoader for autoloading (i.e. use own autoloader)
+	--skip=<path>      File with list of files to skip
+	--logclass=<path>  File to log last used class (useful when crashing)
 
 <?php
 	die();
@@ -56,6 +59,16 @@ if(isset($options['l'])) {
 
 echo "Scanning folder $options[s]\n";
 $model = new Apigen\Model;
+if(isset($options['norobot'])) $model->useRobotLoader = false;
+if(isset($options['logclass'])) {
+	$logClassFile = $model->logLastUsedClass = $options['logclass'];
+
+	// Add to skipped classes
+	if(isset($options['skip']) && file_exists($logClassFile) && ($lastClass = trim(file_get_contents($logClassFile)))) {
+		file_put_contents($options['skip'], $lastClass . "\n", FILE_APPEND);
+	}
+}
+if(isset($options['skip'])) $model->skipClasses = array_filter(array_map(function($item) { return strtolower(trim($item)); }, file($options['skip'])));
 $model->parse($options['s']);
 $count = count($model->getClasses());
 
