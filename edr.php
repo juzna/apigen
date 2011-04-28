@@ -2,8 +2,10 @@
 // Load nette and our functions
 require_once __DIR__ . '/libs/NetteX/nettex.min.php';
 require_once __DIR__ . '/libs/Apigen/PhpParser.php';
+require_once __DIR__ . '/libs/Apigen/CustomClassReflection.php';
 require_once __DIR__ . '/func.php';
 
+Apigen\CustomClassReflection::$allowZendNamespaces = true; // Allow zend-style namespaces
 
 // Set-up paths for EDR
 {

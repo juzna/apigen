@@ -21,6 +21,8 @@ use NetteX;
  */
 class CustomClassReflection extends NetteX\Reflection\ClassType
 {
+	public static $allowZendNamespaces = false;
+
 	private $package = NULL;
 	
 	
@@ -63,7 +65,10 @@ class CustomClassReflection extends NetteX\Reflection\ClassType
 
 			} elseif (preg_match('#\*\s+@package\s+(\S+)#', file_get_contents($this->getFileName()), $matches)) {
 				$this->package = $matches[1]; // found in page-level DocBlock
-			}
+
+			} elseif (self::$allowZendNamespaces && preg_match('#([a-z0-9_]+)_([a-z0-9]+)#Ai', $this->getName(), $matches)) {
+				return strtr($matches[1], '_', '\\'); // Zend style namespace
+			} 
 		}
 		return $this->package;
 	}
