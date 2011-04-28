@@ -21,6 +21,9 @@ use NetteX;
  */
 class Generator extends NetteX\Object
 {
+	/** @var bool */
+	public $verbose = false;
+
 	/** @var Model */
 	private $model;
 
@@ -87,6 +90,7 @@ class Generator extends NetteX\Object
 			// generate class & interface files
 			foreach ($classes as $class) {
 				if($this->model->logLastUsedClass) file_put_contents($this->model->logLastUsedClass, $class->getName());
+				if($this->verbose) echo "Generating " . $class->getName() . "\n";
 				
 				$template->tree = array($class);
 				while ($parent = $template->tree[0]->getParentClass()) {

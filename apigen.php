@@ -25,7 +25,7 @@ APIGen version 0.1
 ';
 
 if(!isset($options) || !is_array($options)) $options = array(); // when include-d from another php file
-$options += getopt('s:d:c:t:l:', array('norobot', 'skip:', 'logclass:'));
+$options += getopt('s:d:c:t:l:v', array('norobot', 'skip:', 'logclass:'));
 
 if (!isset($options['s'], $options['d'])) { ?>
 Usage:
@@ -37,6 +37,7 @@ Options:
 	-c <path>  Output config file.
 	-l <path>  Directory with libraries
 	-t ...     Title of generated documentation.
+	-v         Verbose mode
 	--norobot          Do not use RobotLoader for autoloading (i.e. use own autoloader)
 	--skip=<path>      File with list of files to skip
 	--logclass=<path>  File to log last used class (useful when crashing)
@@ -60,6 +61,7 @@ if(isset($options['l'])) {
 
 echo "Scanning folder $options[s]\n";
 $model = new Apigen\Model;
+if(isset($options['v'])) $model->verbose = true;
 if(isset($options['norobot'])) $model->useRobotLoader = false;
 if(isset($options['logclass'])) {
 	$logClassFile = $model->logLastUsedClass = $options['logclass'];
@@ -99,6 +101,7 @@ foreach (NetteX\Utils\Finder::find('*')->from($options['d'])->childFirst() as $i
 	}
 }
 $generator = new Apigen\Generator($model);
+if(isset($options['v'])) $generator->verbose = true;
 $generator->generate($options['d'], $config);
 
 

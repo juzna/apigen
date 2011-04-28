@@ -30,6 +30,9 @@ class Model extends NetteX\Object
 	/** @var string Path to file to log last used class (useful when loading crashes) */
 	public $logLastUsedClass = null;
 
+	/** @var bool */
+	public $verbose = false;
+
 	/** @var string */
 	private $dir;
 
