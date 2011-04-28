@@ -86,6 +86,8 @@ class Generator extends NetteX\Object
 
 			// generate class & interface files
 			foreach ($classes as $class) {
+				if($this->model->logLastUsedClass) file_put_contents($this->model->logLastUsedClass, $class->getName());
+				
 				$template->tree = array($class);
 				while ($parent = $template->tree[0]->getParentClass()) {
 					array_unshift($template->tree, $parent);
@@ -105,6 +107,8 @@ class Generator extends NetteX\Object
 					$template->setFile($config['templates']['source'])->save(self::forceDir($output . '/' . $this->formatSourceLink($class, FALSE)));
 					$generatedFiles[$file] = TRUE;
 				}
+
+				if($this->model->logLastUsedClass) @unlink($this->model->logLastUsedClass);
 			}
 		}
 	}
