@@ -4134,7 +4134,7 @@ new
 NetteX\DirectoryNotFoundException("Directory '$val' not found.");}$this->scanDirs[]=$real;}}private
 function
 addClass($class,$file,$time){$lClass=strtolower($class);if(isset($this->list[$lClass][0])&&($file2=$this->list[$lClass][0])!==$file&&is_file($file2)){if($this->files[$file2]!==filemtime($file2)){$this->scanScript($file2);return$this->addClass($class,$file,$time);}$e=new
-NetteX\InvalidStateException("Ambiguous class '$class' resolution; defined in $file and in ".$this->list[$lClass][0].".");{throw$e;}}$this->list[$lClass]=array($file,$time,$class);$this->files[$file]=$time;}private
+NetteX\InvalidStateException("Ambiguous class '$class' resolution; defined in $file and in ".$this->list[$lClass][0].".");{echo $e->getMessage() . "\n";}}$this->list[$lClass]=array($file,$time,$class);$this->files[$file]=$time;}private
 function
 scanDirectory($dir){if(is_dir($dir)){$disallow=array();$iterator=NetteX\Utils\Finder::findFiles(Strings::split($this->acceptFiles,'#[,\s]+#'))->filter(function($file)use(&$disallow){return!isset($disallow[$file->getPathname()]);})->from($dir)->exclude(Strings::split($this->ignoreDirs,'#[,\s]+#'))->filter($filter=function($dir)use(&$disallow){$path=$dir->getPathname();if(is_file("$path/netterobots.txt")){foreach(file("$path/netterobots.txt")as$s){if($matches=Strings::match($s,'#^disallow\\s*:\\s*(\\S+)#i')){$disallow[$path.str_replace('/',DIRECTORY_SEPARATOR,rtrim('/'.ltrim($matches[1],'/'),'/'))]=TRUE;}}}return!isset($disallow[$path]);});$filter(new\SplFileInfo($dir));}else{$iterator=new\ArrayIterator(array(new\SplFileInfo($dir)));}foreach($iterator
 as$entry){$path=$entry->getPathname();if(!isset($this->files[$path])||$this->files[$path]!==$entry->getMTime()){$this->scanScript($path);}}}private
