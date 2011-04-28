@@ -98,11 +98,13 @@ function simpleAutoLoader($class) {
 	$file = getClassPath($class);
 	if(!$file) {
 		echo "File for class '$class' not found\n";
+		dumpBackTrace();
 		return false;
 	}
 
 	if(!isSafeToLoadFile($file)) {
 		echo "File for class '$class' found, but is not safe!\n";
+		dumpBackTrace();
 		return false;
 	}
 
@@ -111,8 +113,14 @@ function simpleAutoLoader($class) {
 
 	if(!class_exists($class) && !interface_exists($class)) {
 		echo "File '$file' found, but not class in it '$class'\n";
+		dumpBackTrace();
 		return false;
 	}
 
+	echo "Loaded $class from $file\n";
 	return $cache[$class] = true; // Yeah, we made it
+}
+
+function dumpBackTrace() {
+	file_put_contents('./last_dump', \NetteX\Diagnostics\Debugger::dumpX(debug_backtrace(), true));
 }
