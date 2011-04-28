@@ -24,7 +24,8 @@ APIGen version 0.1
 ------------------
 ';
 
-$options = getopt('s:d:c:t:l:', array('norobot', 'skip:', 'logclass:'));
+if(!isset($options) || !is_array($options)) $options = array(); // when include-d from another php file
+$options += getopt('s:d:c:t:l:', array('norobot', 'skip:', 'logclass:'));
 
 if (!isset($options['s'], $options['d'])) { ?>
 Usage:
