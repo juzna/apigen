@@ -74,6 +74,7 @@ $model->parse($options['s']);
 $count = count($model->getClasses());
 
 $model->expand();
+$model->tidy();
 $countD = count($model->getClasses()) - $count;
 
 echo "Found $count classes and $countD system classes\n";

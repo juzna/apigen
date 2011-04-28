@@ -103,6 +103,14 @@ class Model extends NetteX\Object
 		if($this->logLastUsedClass) @unlink($this->logLastUsedClass);
 	}
 
+	/**
+	 * Tidy list of classes (i.e. remote those item which weren't found, i.e. are false)
+	 */
+	public function tidy()
+	{
+		$this->classes = array_filter($this->classes);
+	}
+
 
 
 	/** @return array or CustomClassReflection */
