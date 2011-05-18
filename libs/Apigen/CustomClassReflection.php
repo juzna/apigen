@@ -136,4 +136,10 @@ class CustomClassReflection extends NetteX\Reflection\ClassType
 		return $this->isSubclassOf('Exception') || $this->getName() === 'Exception';
 	}
 
+	public function getDefaultPropertyValue($name)
+	{
+		$x = $this->getDefaultProperties();
+		return $x[$name]; //isset($x[$name]) ? $x[$name] : null;
+	}
+
 }

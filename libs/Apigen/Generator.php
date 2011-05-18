@@ -88,6 +88,7 @@ class Generator extends NetteX\Object
 			$template->setFile($config['templates']['namespace'])->save(self::forceDir($output . '/' . $this->formatNamespaceLink($namespace)));
 
 			// generate class & interface files
+			/** @var $class \Nette\Reflection\ClassType */
 			foreach ($classes as $class) {
 				if($this->model->logLastUsedClass) file_put_contents($this->model->logLastUsedClass, $class->getName());
 				if($this->verbose) echo "Generating " . $class->getName() . "\n";
@@ -101,6 +102,7 @@ class Generator extends NetteX\Object
 				$template->implementers = $this->model->getDirectImplementers($class);
 				uksort($template->implementers, 'strcasecmp');
 				$template->class = $class;
+				$this->processExtensions($template, $class);
 				$template->setFile($config['templates']['class'])->save(self::forceDir($output . '/' . $this->formatClassLink($class)));
 
 				// generate source codes
@@ -114,6 +116,44 @@ class Generator extends NetteX\Object
 
 				if($this->model->logLastUsedClass) @unlink($this->model->logLastUsedClass);
 			}
+		}
+	}
+
+	protected function processExtensions(\NetteX\Templating\Template $template, CustomClassReflection $class)
+	{
+		// Unset properties which are being changed
+		static $props = array(
+			'zendDbRowClass',
+			'zendDbReferenceMap',
+			'zendDbRowTables',
+		);
+		foreach($props as $f) $template->$f = null;
+
+		// Zend DB Table
+		if($class->isSubclassOf('Zend_Db_Table_Abstract')) {
+			// Row class
+			$rowClass = $class->getDefaultPropertyValue('_rowClass');
+			if(class_exists($rowClass) || class_exists($rowClass .= '_Abstract')) $template->zendDbRowClass = new CustomClassReflection($rowClass);
+
+			// Reference map
+			if(is_array($references = $class->getDefaultPropertyValue('_referenceMap'))) {
+				$refs = array();
+				foreach($references as $alias => $definition) {
+					if(class_exists($clsName = $definition['refTableClass']) || class_exists($clsName .= '_Abstract')) {
+						$refs[] = (object)array(
+							'alias' => $alias,
+							'columns' => (array) $definition['columns'],
+							'ref' => new CustomClassReflection($clsName),
+						);
+					}
+				}
+				$template->zendDbReferenceMap = $refs;
+			}
+		}
+
+		// Zend DB Row
+		if($class->isSubclassOf('Zend_Db_Table_Row_Abstract')) {
+			$template->zendDbRowTables = $this->model->zendFindTablesForRowClass($class);
 		}
 	}
 

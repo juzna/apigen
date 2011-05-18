@@ -4481,7 +4481,22 @@ __isset($name){return
 ObjectMixin::has($this,$name);}function
 __unset($name){ObjectMixin::remove($this,$name);}}class
 Property
-extends\ReflectionProperty{function
+extends\ReflectionProperty{	public function getDefaultValue()
+	{
+		$cls = $this->getDeclaringClass();
+		$list = $cls->getDefaultProperties();
+		$name = $this->getName();
+		return isset($list[$name]) ? $list[$name] : null;
+	}
+
+	public function hasDefaultValue()
+	{
+		$cls = $this->getDeclaringClass();
+		$list = $cls->getDefaultProperties();
+		$name = $this->getName();
+		return isset($list[$name]);
+	}
+function
 __toString(){return'Property '.parent::getDeclaringClass()->getName().'::$'.$this->getName();}function
 getDeclaringClass(){return
 new

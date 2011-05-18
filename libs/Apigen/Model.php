@@ -190,6 +190,22 @@ class Model extends NetteX\Object
 	}
 
 
+	public function zendFindTablesForRowClass($rowClass)
+	{
+		$names = array($rowClass->getName());
+		if(preg_match('/^(.+)_Abstract$/', $names[0], $match)) $names[] = $match[1];
+
+		$res = array();
+		foreach ($this->classes as $class) {
+			if ($class->isSubclassOf('Zend_Db_Table_Abstract') && in_array($class->getProperty('_rowClass')->getDefaultValue(), $names)) {
+				$res[$class->getName()] = $class;
+			}
+		}
+		return $res;
+	}
+
+
+
 
 	/**
 	 * Helpers for DocBlock extracting.

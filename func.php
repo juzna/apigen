@@ -10,7 +10,7 @@ function findFile($file) {
 	else {
         $pathList = explode(PATH_SEPARATOR, get_include_path());
         foreach($pathList as $p) {
-	        if(file_exists($path = preg_replace('%/$%','',$p)."/$file")) return $path;
+	        if(file_exists($path = preg_replace('%/$%','',$p)."/$file")) return realpath($path);
 		}
     }
 	return false;
@@ -63,6 +63,26 @@ function isSafeToLoadFile($file) {
 				$class = $parser->fetchAll(T_STRING, T_NS_SEPARATOR);
 				if($class) $classes[] = $class;
 			} while($parser->fetch(','));
+		}
+		
+		elseif($parser->isCurrent(T_REQUIRE, T_REQUIRE_ONCE, T_INCLUDE, T_INCLUDE_ONCE)) {
+			$what = trim($parser->fetchUntil(';', ')'));
+
+			// Just a file name
+			if(preg_match('~(".+")|(\'.+\')~A', $what)) {
+				$relativePath = substr($what, 1, -1);
+				$file2 = findFile($relativePath) ?: ($relativePath{0} === '/' ? $relativePath : (realpath(dirname($file) . '/' . $relativePath)));
+				if(is_readable($file2)) {
+					if(isSafeToLoadFile($file2)) continue; // It's fine, skip current token
+					else {
+						echo "  File '$file' is trying to load another file: $what, but that is not safe\n";
+						return false;
+					}
+				}
+			}
+
+			echo "  File '$file' is trying to load another file: $what\n";
+			return false;
 		}
 	}
 
@@ -123,4 +143,8 @@ function simpleAutoLoader($class) {
 
 function dumpBackTrace() {
 	file_put_contents('./last_dump', \NetteX\Diagnostics\Debugger::dumpX(debug_backtrace(), true));
+}
+
+function prop($obj, $propName) {
+	return $obj[$propName];
 }

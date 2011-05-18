@@ -43,6 +43,25 @@
 			{foreach $implementers as $item}<a href="{$item|classLink}">{$item->name|replaceNS:$namespace}</a>{sep}, {/sep}{/foreach}
 		</div>
 
+		<div n:if="$zendDbRowClass">
+			<h4>Zend: Row class</h4>
+			<a href="{$zendDbRowClass|classLink}">{$zendDbRowClass->name}</a>
+		</div>
+
+		<div n:if="$zendDbReferenceMap">
+			<h4>Zend: Reference map</h4>
+			<ul>
+				<li n:foreach="$zendDbReferenceMap as $item">
+					{$item->alias} -&gt; <a href="{$item->ref|classLink}">{$item->ref->name}
+				</li>
+			</ul>
+		</div>
+
+		<div n:if="$zendDbRowTables">
+			<h4>Zend: Tables which contains this row</h4>
+			{foreach $zendDbRowTables as $item}<a href="{$item|classLink}">{$item->name|replaceNS:$namespace}</a>{sep}, {/sep}{/foreach}
+		</div>
+
 		<div class="classInfo">
 			{if $class->abstract || $class->final}<b>{if $class->abstract}Abstract{else}Final{/if} {if $class->interface}Interface{else}Class{/if}</b><br>{/if}
 			{foreach $class->annotations as $annotation => $values}

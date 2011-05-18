@@ -25,6 +25,8 @@ Apigen\CustomClassReflection::$allowZendNamespaces = true; // Allow zend-style n
 		. SYSTEM_LOCATION . '/models/' // eDR system-supplied models
 		. PATH_SEPARATOR
 		. '/www/sys/master/site/models/' // THIS IS MISSING IN sys.php
+		. PATH_SEPARATOR
+		. '/www/sys/inform/site/application/models'
 	);
 }
 // print_r(explode(PATH_SEPARATOR, get_include_path()));
